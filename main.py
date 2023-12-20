@@ -74,7 +74,7 @@ if __name__ == "__main__":
     # 读取数据，先进行归一化的数据
     # parser.add_argument('--saved_path', type=str, default='/home/Desktop/new_norm_data/')
 
-    project_path = 'E:/cy/Unet'
+    project_path = 'F:/Unet'
     parser.add_argument('--saved_path', type=str, default=('%s/a_new_npy/' % project_path))
 
     # 结果保存路径（运行文件 + 生成图像数据）
