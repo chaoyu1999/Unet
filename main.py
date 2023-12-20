@@ -1,13 +1,22 @@
 import os
-
-# import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'  ## 1/2 ,multi GPU
-
+import random
+import numpy as np
+import torch
 import argparse
 from torch.backends import cudnn
-
 from loader import get_loader
 from solver import Solver
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+seed = 3407
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
+np.random.seed(seed)  # Numpy module.
+random.seed(seed)  # Python random module.
+torch.manual_seed(seed)
+torch.backends.cudnn.benchmark = False
+torch.backends.cudnn.deterministic = True
 
 
 def main(args):
@@ -74,7 +83,7 @@ if __name__ == "__main__":
     # 读取数据，先进行归一化的数据
     # parser.add_argument('--saved_path', type=str, default='/home/Desktop/new_norm_data/')
 
-    project_path = 'F:/Unet'
+    project_path = 'E:/cy/Unet'
     parser.add_argument('--saved_path', type=str, default=('%s/a_new_npy/' % project_path))
 
     # 结果保存路径（运行文件 + 生成图像数据）
