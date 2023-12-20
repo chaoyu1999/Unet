@@ -138,12 +138,12 @@ class ResUNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        conv1 = self.conv1(x)
-        temp = self.maxpool(conv1)
-        conv2 = self.conv2_x(temp)
-        conv3 = self.conv3_x(conv2)
-        conv4 = self.conv4_x(conv3)
-        bottle = self.conv5_x(conv4)
+        conv1 = self.conv1(x)  # shape(b,64,32, 32)
+        temp = self.maxpool(conv1)  # shape(b,64, 16,16)
+        conv2 = self.conv2_x(temp) # shape(b,64,16,16)
+        conv3 = self.conv3_x(conv2) # shape(b, 128, 8,8)
+        conv4 = self.conv4_x(conv3) # shape(b, 256, 4, 4)
+        bottle = self.conv5_x(conv4) # shape(b, 512, 2, 2)
         # output = self.avg_pool(output)
         # output = output.view(output.size(0), -1)
         # output = self.fc(output)

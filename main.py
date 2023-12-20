@@ -74,11 +74,11 @@ if __name__ == "__main__":
     # 读取数据，先进行归一化的数据
     # parser.add_argument('--saved_path', type=str, default='/home/Desktop/new_norm_data/')
 
-    root_path = 'F:/Unet'
-    parser.add_argument('--saved_path', type=str, default='F:/TemporaryFiles/Unet/project/a_new_npy/')
+    project_path = 'E:/cy/Unet'
+    parser.add_argument('--saved_path', type=str, default=('%s/a_new_npy/' % project_path))
 
     # 结果保存路径（运行文件 + 生成图像数据）
-    parser.add_argument('--save_path', type=str, default="F:/Unet/save_a/")
+    parser.add_argument('--save_path', type=str, default=("%s/save_ResUnet/" % project_path))
 
     # 测试文件夹(test_patient)的名字 设为‘L506’
     # 将转换的np CT图像文件，通过条件遍历(是否以input/target结尾)，一同保存到列表里面
