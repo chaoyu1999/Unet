@@ -10,11 +10,12 @@ from sklearn.metrics import mean_absolute_error as compare_mae
 # 计算图像的指标，即平均相似度、峰值信噪比、均方误差 等相关指标
 
 # 输入图像文件夹路径
-cbcts_path = '/home/Desktop/pycharm_multi/save/fig/input/'
+save_path = 'E:/cy/Unet/save_ResUnet'
+cbcts_path = '%s/fig/input/' % save_path
 # 目标图像文件夹路径
-rpcts_path = '/home/Desktop/pycharm_multi/save/fig/target/'
+rpcts_path = '%s/fig/target/' % save_path
 # 模型输出图像文件夹路径
-models_path = '/home/Desktop/pycharm_multi/save/fig/output/'
+models_path = '%s/fig/output/' % save_path
 
 # 获取输入图像文件夹中的文件列表，即输入数据，带有环形伪影的数据集
 cbcts_file = os.listdir(cbcts_path)
@@ -58,9 +59,9 @@ for cbct_file in cbcts_file:
 
     # 计算原始图像和模型输出图像的峰值信噪比和结构相似度
     cbct_psnr.append(compare_psnr(image_true=rpct_img, image_test=cbct_img))
-    cbct_ssim.append(compare_ssim(im1=rpct_img, im2=cbct_img))
+    cbct_ssim.append(compare_ssim(im1=rpct_img, im2=cbct_img, data_range=1))
     model_psnr.append(compare_psnr(image_true=rpct_img, image_test=model_img))
-    model_ssim.append(compare_ssim(im1=rpct_img, im2=model_img))
+    model_ssim.append(compare_ssim(im1=rpct_img, im2=model_img, data_range=1))
 
     # 将图像像素值转换为HU值
     cbct_img = cbct_img * 4095 - 1000

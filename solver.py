@@ -19,6 +19,7 @@ from networks import U_Net  # 从网络模块中引入RED-CNN模型
 from model.DRUNet_model import DRUNet_CBAM, DRUNet, DRUNet_CBAM_Multiscale
 from model.ResUNet import getResUNet
 
+
 # 该文件是处理步骤的集合(包括保存加载模型、学习率衰减、归一化、保存图像、训练和测试过程)
 
 # 定义一个类Solver类，继承object类，其为所有类的基类。
@@ -256,7 +257,7 @@ class Solver(object):
                 # loss_1 = self.criterion(o1, y1)
                 # loss_2 = self.criterion(o2, y2)
                 loss_3 = self.criterion(pred, y)
-                loss = loss_3 #+ loss_1 + loss_2
+                loss = loss_3  # + loss_1 + loss_2
                 # 确定损失函数 - 预测值与实际值之间的差
                 ####
                 # self.REDCNN.zero_grad()  # 模型梯度清零，为反向传播优化参数作准备
@@ -305,7 +306,7 @@ class Solver(object):
                 # 保存最好的模型
                 if np.mean(loss_list) < 0.0003 and np.mean(loss_list) < best_loss:
                     best_loss = loss.item()
-                    self.save_model("best_"+str(total_iters))
+                    self.save_model("best_" + str(total_iters))
 
         # 保存最后一次的训练结果
         self.save_model(total_iters)
@@ -332,20 +333,24 @@ class Solver(object):
         ####
         # load，加载模型
         # self.REDCNN = RED_CNN().to(self.device)
-        self.U_Net = DRUNet_CBAM_Multiscale().to(self.device)
+        self.U_Net = getResUNet(in_channel=1, out_channel=1).to(self.device)
         # self.U_Net = R2U_Net().to(self.device)
         # self.U_Net = AttU_Ne().to(self.device)
         # self.U_Net = R2AttU_Net().to(self.device)
         # self.U_Net = unet_sqq().to(self.device)
 
-        path_root = "F:/TemporaryFiles/Unet/project/pycharm_unet"
+        path_root = "E:/cy/Unet/save_ResUnet"
         path_input = "%s/fig/input/" % path_root
         path_target = "%s/fig/target/" % path_root
         path_output = "%s/fig/output/" % path_root
-
+        # 检查并创建路径
+        self.create_path_if_not_exists(path_root)
+        self.create_path_if_not_exists(path_input)
+        self.create_path_if_not_exists(path_target)
+        self.create_path_if_not_exists(path_output)
         # 加载模型，第test_iters次训练的模型
-        self.load_model(self.test_iters)
-
+        # self.load_model(self.test_iters)
+        self.U_Net.load_state_dict(torch.load("./save_ResUnet/U_Net_46943iter.ckpt", map_location=self.device))
         # compute PSNR, SSIM, RMSE - 计算评价指标
         ori_psnr_avg, ori_ssim_avg, ori_rmse_avg = 0, 0, 0
         pred_psnr_avg, pred_ssim_avg, pred_rmse_avg = 0, 0, 0
@@ -363,7 +368,8 @@ class Solver(object):
 
                 ####
                 # pred = self.REDCNN(x)  # 放入模型，进行预测
-                _, __, pred = self.U_Net(x)
+                # _, __, pred = self.U_Net(x)
+                pred = self.U_Net(x)
                 # pred = self.R2U_Net(x)
                 # pred = self.AttU_Ne(x)
                 # pred = self.R2AttU_Net(x)
@@ -459,7 +465,7 @@ class Solver(object):
                         .float()
                         .to(self.device)
                     )
-                    _,__,pred = self.U_Net(img)
+                    _, __, pred = self.U_Net(img)
                     pred = self.trunc(
                         self.denormalize_(pred.view(512, 512).cpu().detach())
                     )
@@ -476,3 +482,11 @@ class Solver(object):
                     # 拼接图像并保存
                     # img = np.concatenate((img_source, pred), axis=1)
                     cv2.imwrite(os.path.join(save_path, f), pred)
+
+    # 创建一个函数来检查路径是否存在，如果不存在则创建它
+    def create_path_if_not_exists(self, p):
+        if not os.path.exists(p):
+            os.makedirs(p)
+            print(f"路径已创建：{p}")
+        else:
+            print(f"路径已存在：{p}")
