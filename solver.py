@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib
 import cv2
 
+from model.CBDNet import UNet, Network
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from collections import OrderedDict
@@ -74,7 +76,9 @@ class Solver(object):
         # 确定网络结构 - 残差卷积自编码网络模型
         ####
         # self.U_Net = U_Net()
-        self.U_Net = getResUNet(in_channel=1, out_channel=1)
+        # self.U_Net = getResUNet(in_channel=1, out_channel=1)
+        self.U_Net = Network()
+
         # 判断有几个CUDA处理器，选择其中一个
 
         if (self.multi_gpu) and (torch.cuda.device_count() > 1):
