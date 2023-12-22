@@ -77,10 +77,8 @@ class Solver(object):
         ####
         self.U_Net = DRUNet_CBAM_Multiscale()
         # self.U_Net = getResUNet(in_channel=1, out_channel=1)
-        # self.U_Net = Network()
 
         # 判断有几个CUDA处理器，选择其中一个
-
         if (self.multi_gpu) and (torch.cuda.device_count() > 1):
             print("Use {} GPUs".format(torch.cuda.device_count()))
 
