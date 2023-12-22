@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     # 添加参数 - 项目中所能用到的参数 几乎都在这了！
     # 设置网络模式 - 训练 or 测试
-    parser.add_argument('--mode', type=str, default='train')
+    parser.add_argument('--mode', type=str, default='test')
 
     # 设置运行模式（0/1），内存<10 设为0，内存>10 设为1。
     parser.add_argument('--load_mode', type=int, default=0)
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     parser.add_argument('--patch_size', type=int, default=64)  # 128/0
 
     # 设置批次大小
-    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--batch_size', type=int, default=8)
 
     # 设置总数据迭代的轮数
     parser.add_argument('--num_epochs', type=int, default=300)
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     parser.add_argument('--print_iters', type=int, default=20)
 
     # 设置学习率衰减的次数  原来=3000
-    parser.add_argument('--decay_iters', type=int, default=10000)
+    parser.add_argument('--decay_iters', type=int, default=3000)
 
     # 设置  原来=1000
     parser.add_argument('--save_iters', type=int, default=1000)

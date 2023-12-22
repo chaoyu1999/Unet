@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib
 import cv2
 
-from model.CBDNet import UNet, Network
+from model.NAF_Simple_UNet import UNet, Network
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -337,7 +337,7 @@ class Solver(object):
         ####
         # load，加载模型
         # self.REDCNN = RED_CNN().to(self.device)
-        self.U_Net = getResUNet(in_channel=1, out_channel=1).to(self.device)
+        self.U_Net = Network().to(self.device)
         # self.U_Net = R2U_Net().to(self.device)
         # self.U_Net = AttU_Ne().to(self.device)
         # self.U_Net = R2AttU_Net().to(self.device)
@@ -354,7 +354,7 @@ class Solver(object):
         self.create_path_if_not_exists(path_output)
         # 加载模型，第test_iters次训练的模型
         # self.load_model(self.test_iters)
-        self.U_Net.load_state_dict(torch.load("./save_ResUnet/U_Net_46943iter.ckpt", map_location=self.device))
+        self.U_Net.load_state_dict(torch.load("./save_ResUnet/U_Net_best_59541iter.ckpt", map_location=self.device))
         # compute PSNR, SSIM, RMSE - 计算评价指标
         ori_psnr_avg, ori_ssim_avg, ori_rmse_avg = 0, 0, 0
         pred_psnr_avg, pred_ssim_avg, pred_rmse_avg = 0, 0, 0
