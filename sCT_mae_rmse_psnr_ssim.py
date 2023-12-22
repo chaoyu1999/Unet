@@ -10,7 +10,7 @@ from sklearn.metrics import mean_absolute_error as compare_mae
 # 计算图像的指标，即平均相似度、峰值信噪比、均方误差 等相关指标
 
 # 输入图像文件夹路径
-save_path = 'E:/cy/Unet/save_ResUnet'
+save_path = 'E:/cy/Unet/save_NAF_LOSS'
 cbcts_path = '%s/fig/input/' % save_path
 # 目标图像文件夹路径
 rpcts_path = '%s/fig/target/' % save_path

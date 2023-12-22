@@ -52,10 +52,10 @@ class DRUNet_CBAM_Multiscale(nn.Module):
             right1_map, scale_factor=4, mode="bilinear", align_corners=False
         )
 
-        out_1 = self.out_1(right1_map)
+        # out_1 = self.out_1(right1_map)
         up2_map = self.up2(right1_map, left1_map)
         right2_map = self.right2(up2_map)
-        out_2 = self.out_2(right2_map)
+        # out_2 = self.out_2(right2_map)
         r2 = F.interpolate(
             right2_map, scale_factor=2, mode="bilinear", align_corners=False
         )
@@ -66,7 +66,7 @@ class DRUNet_CBAM_Multiscale(nn.Module):
         cat_out = torch.cat([right3_map, r1, r2], dim=1)
         output = cat_out + self.ca(cat_out) * cat_out
         output = self.output(output)
-        return out_1, out_2, output
+        return output
 
 
 class DRUNet_CBAM(nn.Module):

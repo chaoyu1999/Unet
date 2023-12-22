@@ -2,4 +2,9 @@ save_a
 .idea
 __pycache__
 a_new_npy
-save_ResUnet
+save_NAF
+save_NAF_LOSS
+save_DRUNet
+*.npy
+*.tif
+*.cpkt
