@@ -7,4 +7,4 @@ save_NAF_LOSS
 save_DRUNet
 *.npy
 *.tif
-*.cpkt
+*.ckpt

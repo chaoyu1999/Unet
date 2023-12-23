@@ -172,9 +172,9 @@ class UNet(nn.Module):
         return out
 
 
-class Network(nn.Module):
+class NAFUNet(nn.Module):
     def __init__(self):
-        super(Network, self).__init__()
+        super(NAFUNet, self).__init__()
         self.unet = UNet()
 
     def forward(self, x):
