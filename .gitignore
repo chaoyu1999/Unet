@@ -4,6 +4,7 @@ __pycache__
 a_new_npy
 save_NAF
 save_NAF_LOSS
+save_SimpleUNet
 save_DRUNet
 *.npy
 *.tif
