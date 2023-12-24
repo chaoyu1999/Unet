@@ -4,8 +4,6 @@ import numpy as np
 import matplotlib
 import cv2
 
-
-
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from collections import OrderedDict
@@ -22,6 +20,7 @@ from model.DRUNet_model import DRUNet_CBAM, DRUNet, DRUNet_CBAM_Multiscale
 from model.ResUNet import getResUNet
 from model.NAF_Simple_UNet import NAFUNet, MS_SSIM_L1_LOSS
 from model.Simple_UNet import SimpleUNet
+
 
 # 该文件是处理步骤的集合(包括保存加载模型、学习率衰减、归一化、保存图像、训练和测试过程)
 
@@ -297,14 +296,15 @@ class Solver(object):
 
                 # save model，当满足某条件时 进行模型的保存
                 if total_iters % self.save_iters == 0:
-                    self.save_model(total_iters)
+                    pass  # 暂时不保存模型
+                    # self.save_model(total_iters)
                     # os.path.join()表示连接函数，作用是连接字符串
-                    np.save(
-                        os.path.join(
-                            self.save_path, "loss_{}_iter.npy".format(total_iters)
-                        ),
-                        np.array(train_losses),
-                    )
+                    # np.save(
+                    #     os.path.join(
+                    #         self.save_path, "loss_{}_iter.npy".format(total_iters)
+                    #     ),
+                    #     np.array(train_losses),
+                    # )
 
                 # 保存最好的模型
                 if total_iters > 10000 and np.mean(loss_list) < best_loss:
@@ -322,7 +322,7 @@ class Solver(object):
 
         # 绘制loss折线，用红色线条绘制
         ## save loss figure
-        plt.plot(np.array(loss_all), "r")  ## print out the loss curve
+        # plt.plot(np.array(loss_all), "r")  ## print out the loss curve
         # plt.show()
         # 将所作的图保存在save文件夹中的loss.png中
         # plt.savefig('save/loss.png') # 保存文件名
