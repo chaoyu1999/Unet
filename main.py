@@ -87,7 +87,7 @@ if __name__ == "__main__":
     parser.add_argument('--saved_path', type=str, default=('%s/a_new_npy/' % project_path))
 
     # 结果保存路径（运行文件 + 生成图像数据）
-    parser.add_argument('--save_path', type=str, default=("%s/save_ResUnet/" % project_path))
+    parser.add_argument('--save_path', type=str, default=("%s/save_NAF/" % project_path))
 
     # 测试文件夹(test_patient)的名字 设为‘L506’
     # 将转换的np CT图像文件，通过条件遍历(是否以input/target结尾)，一同保存到列表里面
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     parser.add_argument('--patch_size', type=int, default=64)  # 128/0
 
     # 设置批次大小
-    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--batch_size', type=int, default=8)
 
     # 设置总数据迭代的轮数
     parser.add_argument('--num_epochs', type=int, default=300)

@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib
 import cv2
 
+
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from collections import OrderedDict
@@ -18,7 +20,8 @@ import torch.optim as optim
 from networks import U_Net  # 从网络模块中引入RED-CNN模型
 from model.DRUNet_model import DRUNet_CBAM, DRUNet, DRUNet_CBAM_Multiscale
 from model.ResUNet import getResUNet
-
+from model.NAF_Simple_UNet import NAFUNet, MS_SSIM_L1_LOSS
+from model.Simple_UNet import SimpleUNet
 
 # 该文件是处理步骤的集合(包括保存加载模型、学习率衰减、归一化、保存图像、训练和测试过程)
 
@@ -73,10 +76,9 @@ class Solver(object):
 
         # 确定网络结构 - 残差卷积自编码网络模型
         ####
-        # self.U_Net = U_Net()
-        self.U_Net = getResUNet(in_channel=1, out_channel=1)
-        # 判断有几个CUDA处理器，选择其中一个
+        self.U_Net = NAFUNet()
 
+        # 判断有几个CUDA处理器，选择其中一个
         if (self.multi_gpu) and (torch.cuda.device_count() > 1):
             print("Use {} GPUs".format(torch.cuda.device_count()))
 
@@ -92,6 +94,7 @@ class Solver(object):
 
         self.lr = args.lr  # 设置学习率
         self.criterion = nn.MSELoss()  # 设置损失函数，为均方误差
+        # self.criterion = MS_SSIM_L1_LOSS(data_range=1.0)
         ####
         # self.optimizer = optim.Adam(self.REDCNN.parameters(), self.lr) # 设置优化器
         self.optimizer = optim.Adam(self.U_Net.parameters(), self.lr)
@@ -239,13 +242,13 @@ class Solver(object):
                     x = x.view(-1, 1, 512, 512)
                     y = y.view(-1, 1, 512, 512)
 
-                y1 = F.interpolate(
-                    y, size=(32, 32), mode="bilinear", align_corners=False
-                )
-
-                y2 = F.interpolate(
-                    y, size=(64, 64), mode="bilinear", align_corners=False
-                )
+                # y1 = F.interpolate(
+                #     y, size=(32, 32), mode="bilinear", align_corners=False
+                # )
+                #
+                # y2 = F.interpolate(
+                #     y, size=(64, 64), mode="bilinear", align_corners=False
+                # )
                 ####
                 # pred = self.REDCNN(x)  # 将数据放到模型中进行训练
                 pred = self.U_Net(x)
@@ -304,7 +307,7 @@ class Solver(object):
                     )
 
                 # 保存最好的模型
-                if np.mean(loss_list) < 0.0003 and np.mean(loss_list) < best_loss:
+                if total_iters > 10000 and np.mean(loss_list) < best_loss:
                     best_loss = loss.item()
                     self.save_model("best_" + str(total_iters))
 
@@ -333,13 +336,13 @@ class Solver(object):
         ####
         # load，加载模型
         # self.REDCNN = RED_CNN().to(self.device)
-        self.U_Net = getResUNet(in_channel=1, out_channel=1).to(self.device)
+        self.U_Net = NAFUNet().to(self.device)
         # self.U_Net = R2U_Net().to(self.device)
         # self.U_Net = AttU_Ne().to(self.device)
         # self.U_Net = R2AttU_Net().to(self.device)
         # self.U_Net = unet_sqq().to(self.device)
 
-        path_root = "E:/cy/Unet/save_ResUnet"
+        path_root = "E:/cy/Unet/save_NAF"
         path_input = "%s/fig/input/" % path_root
         path_target = "%s/fig/target/" % path_root
         path_output = "%s/fig/output/" % path_root
@@ -350,7 +353,7 @@ class Solver(object):
         self.create_path_if_not_exists(path_output)
         # 加载模型，第test_iters次训练的模型
         # self.load_model(self.test_iters)
-        self.U_Net.load_state_dict(torch.load("./save_ResUnet/U_Net_46943iter.ckpt", map_location=self.device))
+        self.U_Net.load_state_dict(torch.load(path_root + "/U_Net_93587iter.ckpt", map_location=self.device))
         # compute PSNR, SSIM, RMSE - 计算评价指标
         ori_psnr_avg, ori_ssim_avg, ori_rmse_avg = 0, 0, 0
         pred_psnr_avg, pred_ssim_avg, pred_rmse_avg = 0, 0, 0
