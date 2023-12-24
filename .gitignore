@@ -6,6 +6,7 @@ save_NAF
 save_NAF_LOSS
 save_SimpleUNet
 pictures
+new_data
 save_DRUNet
 *.npy
 *.tif

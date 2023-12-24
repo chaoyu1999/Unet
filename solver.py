@@ -444,10 +444,14 @@ class Solver(object):
     # 测试文件中的图像
     def test_img(self):
         del self.U_Net
-        self.U_Net = DRUNet_CBAM_Multiscale().to(self.device)
-        self.load_model(self.test_iters)
-        data_path = "C:/Users/25351/Downloads/new_data/input"  # 测试图像文件夹的路径
-        save_path = os.path.join("C:/Users/25351/Downloads/new_data/", "drunet")
+        self.U_Net = NAFUNet().to(self.device)
+
+        # self.load_model(self.test_iters)
+        self.U_Net.load_state_dict(
+            torch.load(f=r"E:\cy\Unet\save_NAF_LOSS\U_Net_42000iter.ckpt", map_location='cuda'))
+
+        data_path = "E:/cy/Unet/new_data/"  # 测试图像文件夹的路径
+        save_path = os.path.join("E:/cy/Unet/pictures/DB_0/", "3-save_NAF_LOSS")
         with torch.no_grad():
             for f in os.listdir(data_path):
                 if f.endswith(".tif"):
@@ -468,7 +472,7 @@ class Solver(object):
                         .float()
                         .to(self.device)
                     )
-                    _, __, pred = self.U_Net(img)
+                    pred = self.U_Net(img)
                     pred = self.trunc(
                         self.denormalize_(pred.view(512, 512).cpu().detach())
                     )
@@ -484,6 +488,7 @@ class Solver(object):
 
                     # 拼接图像并保存
                     # img = np.concatenate((img_source, pred), axis=1)
+                    cv2.imwrite("E:/cy/Unet/pictures/DB_0/0-input/" + f, img_source)
                     cv2.imwrite(os.path.join(save_path, f), pred)
 
     # 创建一个函数来检查路径是否存在，如果不存在则创建它
