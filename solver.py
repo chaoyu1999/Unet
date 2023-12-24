@@ -76,8 +76,7 @@ class Solver(object):
 
         # 确定网络结构 - 残差卷积自编码网络模型
         ####
-        self.U_Net = SimpleUNet()
-        # self.U_Net = getResUNet(in_channel=1, out_channel=1)
+        self.U_Net = NAFUNet()
 
         # 判断有几个CUDA处理器，选择其中一个
         if (self.multi_gpu) and (torch.cuda.device_count() > 1):
@@ -337,13 +336,13 @@ class Solver(object):
         ####
         # load，加载模型
         # self.REDCNN = RED_CNN().to(self.device)
-        self.U_Net = SimpleUNet().to(self.device)
+        self.U_Net = NAFUNet().to(self.device)
         # self.U_Net = R2U_Net().to(self.device)
         # self.U_Net = AttU_Ne().to(self.device)
         # self.U_Net = R2AttU_Net().to(self.device)
         # self.U_Net = unet_sqq().to(self.device)
 
-        path_root = "E:/cy/Unet/save_SimpleUNet"
+        path_root = "E:/cy/Unet/save_NAF"
         path_input = "%s/fig/input/" % path_root
         path_target = "%s/fig/target/" % path_root
         path_output = "%s/fig/output/" % path_root
@@ -354,7 +353,7 @@ class Solver(object):
         self.create_path_if_not_exists(path_output)
         # 加载模型，第test_iters次训练的模型
         # self.load_model(self.test_iters)
-        self.U_Net.load_state_dict(torch.load(path_root + "/U_Net_best_20021iter.ckpt", map_location=self.device))
+        self.U_Net.load_state_dict(torch.load(path_root + "/U_Net_93587iter.ckpt", map_location=self.device))
         # compute PSNR, SSIM, RMSE - 计算评价指标
         ori_psnr_avg, ori_ssim_avg, ori_rmse_avg = 0, 0, 0
         pred_psnr_avg, pred_ssim_avg, pred_rmse_avg = 0, 0, 0

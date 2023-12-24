@@ -87,7 +87,7 @@ if __name__ == "__main__":
     parser.add_argument('--saved_path', type=str, default=('%s/a_new_npy/' % project_path))
 
     # 结果保存路径（运行文件 + 生成图像数据）
-    parser.add_argument('--save_path', type=str, default=("%s/save_SimpleUNet/" % project_path))
+    parser.add_argument('--save_path', type=str, default=("%s/save_NAF/" % project_path))
 
     # 测试文件夹(test_patient)的名字 设为‘L506’
     # 将转换的np CT图像文件，通过条件遍历(是否以input/target结尾)，一同保存到列表里面
