@@ -341,7 +341,7 @@ class Solver(object):
         # self.U_Net = AttU_Ne().to(self.device)
         # self.U_Net = R2AttU_Net().to(self.device)
         # self.U_Net = unet_sqq().to(self.device)
-
+        '''注意：路径'''
         path_root = "E:/cy/Unet/save_NAF"
         path_input = "%s/fig/input/" % path_root
         path_target = "%s/fig/target/" % path_root
@@ -353,7 +353,8 @@ class Solver(object):
         self.create_path_if_not_exists(path_output)
         # 加载模型，第test_iters次训练的模型
         # self.load_model(self.test_iters)
-        self.U_Net.load_state_dict(torch.load(path_root + "/U_Net_93587iter.ckpt", map_location=self.device))
+        '''注意：模型路径为绝对路径了！'''
+        self.U_Net.load_state_dict(torch.load(path_root + "/U_Net_best.ckpt", map_location=self.device))
         # compute PSNR, SSIM, RMSE - 计算评价指标
         ori_psnr_avg, ori_ssim_avg, ori_rmse_avg = 0, 0, 0
         pred_psnr_avg, pred_ssim_avg, pred_rmse_avg = 0, 0, 0
