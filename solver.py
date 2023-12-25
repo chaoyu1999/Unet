@@ -93,6 +93,7 @@ class Solver(object):
 
         self.lr = args.lr  # 设置学习率
         # self.criterion = nn.MSELoss()  # 设置损失函数，为均方误差
+        '''这里改了loss函数为MS_SSIM_L1_LOSS'''
         self.criterion = MS_SSIM_L1_LOSS(data_range=1.0)
         ####
         # self.optimizer = optim.Adam(self.REDCNN.parameters(), self.lr) # 设置优化器
