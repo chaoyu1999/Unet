@@ -353,7 +353,7 @@ class Solver(object):
         self.create_path_if_not_exists(path_output)
         # 加载模型，第test_iters次训练的模型
         # self.load_model(self.test_iters)
-        self.U_Net.load_state_dict(torch.load(path_root + "/U_Net_42000iter.ckpt", map_location=self.device))
+        self.U_Net.load_state_dict(torch.load(path_root + "/U_Net_best.ckpt", map_location=self.device))
         # compute PSNR, SSIM, RMSE - 计算评价指标
         ori_psnr_avg, ori_ssim_avg, ori_rmse_avg = 0, 0, 0
         pred_psnr_avg, pred_ssim_avg, pred_rmse_avg = 0, 0, 0
