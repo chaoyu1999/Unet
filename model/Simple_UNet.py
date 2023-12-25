@@ -3,49 +3,53 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# 定义UNet模型
 class UNet(nn.Module):
     def __init__(self):
         super(UNet, self).__init__()
 
+        # 编码器部分
         self.inc = nn.Sequential(
-            single_conv(1, 64),
-            single_conv(64, 64)
+            single_conv(1, 64),  # 单层卷积
+            single_conv(64, 64)  # 单层卷积
         )
 
-        self.down1 = nn.AvgPool2d(2)
+        self.down1 = nn.AvgPool2d(2)  # 下采样
         self.conv1 = nn.Sequential(
-            single_conv(64, 128),
-            single_conv(128, 128),
-            single_conv(128, 128)
+            single_conv(64, 128),  # 单层卷积
+            single_conv(128, 128),  # 单层卷积
+            single_conv(128, 128)  # 单层卷积
         )
 
-        self.down2 = nn.AvgPool2d(2)
+        self.down2 = nn.AvgPool2d(2)  # 下采样
         self.conv2 = nn.Sequential(
-            single_conv(128, 256),
-            single_conv(256, 256),
-            single_conv(256, 256),
-            single_conv(256, 256),
-            single_conv(256, 256),
-            single_conv(256, 256)
+            single_conv(128, 256),  # 单层卷积
+            single_conv(256, 256),  # 单层卷积
+            single_conv(256, 256),  # 单层卷积
+            single_conv(256, 256),  # 单层卷积
+            single_conv(256, 256),  # 单层卷积
+            single_conv(256, 256)  # 单层卷积
         )
 
-        self.up1 = up(256)
+        # 解码器部分
+        self.up1 = up(256)  # 上采样
         self.conv3 = nn.Sequential(
-            single_conv(128, 128),
-            single_conv(128, 128),
-            single_conv(128, 128)
+            single_conv(128, 128),  # 单层卷积
+            single_conv(128, 128),  # 单层卷积
+            single_conv(128, 128)  # 单层卷积
         )
 
-        self.up2 = up(128)
+        self.up2 = up(128)  # 上采样
         self.conv4 = nn.Sequential(
-            single_conv(64, 64),
-            single_conv(64, 64)
+            single_conv(64, 64),  # 单层卷积
+            single_conv(64, 64)  # 单层卷积
         )
 
-        self.outc = outconv(64, 1)
+        self.outc = outconv(64, 1)  # 输出层
 
+    # 前向传播
     def forward(self, x):
-        inx = self.inc(x)
+        inx = self.inc(x)  # 编码器部分
 
         down1 = self.down1(inx)
         conv1 = self.conv1(down1)
@@ -53,37 +57,39 @@ class UNet(nn.Module):
         down2 = self.down2(conv1)
         conv2 = self.conv2(down2)
 
-        up1 = self.up1(conv2, conv1)
+        up1 = self.up1(conv2, conv1)  # 解码器部分
         conv3 = self.conv3(up1)
 
-        up2 = self.up2(conv3, inx)
+        up2 = self.up2(conv3, inx)  # 解码器部分
         conv4 = self.conv4(up2)
 
-        out = self.outc(conv4)
+        out = self.outc(conv4)  # 输出
         return out
 
 
+# 定义单层卷积模块
 class single_conv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(single_conv, self).__init__()
         self.conv = nn.Sequential(
-            nn.Conv2d(in_ch, out_ch, 3, padding=1),
-            nn.GELU()
+            nn.Conv2d(in_ch, out_ch, 3, padding=1),  # 3x3卷积
+            nn.GELU()  # GELU激活函数
         )
 
     def forward(self, x):
         return self.conv(x)
 
 
+# 定义上采样模块
 class up(nn.Module):
     def __init__(self, in_ch):
         super(up, self).__init__()
-        self.up = nn.ConvTranspose2d(in_ch, in_ch // 2, 2, stride=2)
+        self.up = nn.ConvTranspose2d(in_ch, in_ch // 2, 2, stride=2)  # 转置卷积
 
     def forward(self, x1, x2):
         x1 = self.up(x1)
 
-        # input is CHW
+        # 输入为CHW
         diffY = x2.size()[2] - x1.size()[2]
         diffX = x2.size()[3] - x1.size()[3]
 
@@ -94,39 +100,24 @@ class up(nn.Module):
         return x
 
 
+# 定义输出层
 class outconv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(outconv, self).__init__()
-        self.conv = nn.Conv2d(in_ch, out_ch, 1)
+        self.conv = nn.Conv2d(in_ch, out_ch, 1)  # 1x1卷积
 
     def forward(self, x):
         x = self.conv(x)
         return x
 
 
+# 定义简化版UNet模型
 class SimpleUNet(nn.Module):
     def __init__(self):
         super(SimpleUNet, self).__init__()
         self.unet = UNet()
 
+    # 前向传播
     def forward(self, x):
         out = self.unet(x) + x
         return out
-
-
-if __name__ == "__main__":
-    # 假设输入通道数为c，这里我们可以自定义，例如c=16
-    input_channels = 16
-    # 创建一个NAFBlock实例
-    naf_block = Network()
-
-    # 创建一个batch_size=1, channels=input_channels, height=64, width=64的随机输入张量
-    input_tensor = torch.rand(1, input_channels, 64, 64)
-
-    # 将输入张量传递给NAFBlock
-    output_tensor = naf_block(input_tensor)
-
-    # 检查输出张量的形状是否与输入张量相同
-    assert output_tensor.shape == input_tensor.shape, f"Output shape {output_tensor.shape} is not the same as input shape {input_tensor.shape}"
-
-    print("Test case passed. The output shape is correct.")

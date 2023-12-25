@@ -6,12 +6,24 @@ from ultralytics.nn.modules import LayerNorm2d
 
 class SimpleGate(nn.Module):
     def forward(self, x):
-        x1, x2 = x.chunk(2, dim=1)
+        """
+        简单门模块的前向传播函数
+        :param x: 输入张量
+        :return: x1和x2的乘积
+        """
+        x1, x2 = x.chunk(2, dim=1)  # 将输入张量x在 dim-1 上分割成两部分x1和x2
         return x1 * x2
 
 
 class NAFBlock(nn.Module):
     def __init__(self, c, DW_Expand=2, FFN_Expand=2, drop_out_rate=0.):
+        """
+        NAFBlock模块的初始化函数
+        :param c: 输入通道数
+        :param DW_Expand: 深度可分离卷积的扩展倍数
+        :param FFN_Expand: 前馈神经网络的扩展倍数
+        :param drop_out_rate: dropout率
+        """
         super().__init__()
         dw_channel = c * DW_Expand
         self.conv1 = nn.Conv2d(in_channels=c, out_channels=dw_channel, kernel_size=1, padding=0, stride=1, groups=1,
@@ -22,7 +34,7 @@ class NAFBlock(nn.Module):
         self.conv3 = nn.Conv2d(in_channels=dw_channel // 2, out_channels=c, kernel_size=1, padding=0, stride=1,
                                groups=1, bias=True)
 
-        # Simplified Channel Attention
+        # 简化通道注意力
         self.sca = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
             nn.Conv2d(in_channels=dw_channel // 2, out_channels=dw_channel // 2, kernel_size=1, padding=0, stride=1,
@@ -48,6 +60,11 @@ class NAFBlock(nn.Module):
         self.gamma = nn.Parameter(torch.zeros((1, c, 1, 1)), requires_grad=True)
 
     def forward(self, inp):
+        """
+        NAFBlock模块的前向传播函数
+        :param inp: 输入张量
+        :return: 经过模块处理后的张量
+        """
         x = inp
 
         x = self.norm1(x)
@@ -184,18 +201,16 @@ class NAFUNet(nn.Module):
 
 class MS_SSIM_L1_LOSS(nn.Module):
     """
-    Have to use cuda, otherwise the speed is too slow.
-    Both the group and shape of input image should be attention on.
-    I set 255 and 1 for gray image as default.
+    MS-SSIM和L1损失的结合，用于图像质量评价和图像重建任务
     """
 
     def __init__(self, gaussian_sigmas=None,
-                 data_range=255.0,
+                 data_range=255.0,  # 图像数据的范围
                  K=(0.01, 0.03),  # c1,c2
-                 alpha=0.025,  # weight of ssim and l1 loss
-                 compensation=200.0,  # final factor for total loss
-                 cuda_dev=0,  # cuda device choice
-                 channel=1):  # RGB image should set to 3 and Gray image should be set to 1
+                 alpha=0.025,  # ssim和l1损失的权重
+                 compensation=200.0,  # 总损失的最终补偿因子
+                 cuda_dev=0,  # cuda设备选择
+                 channel=1):  # RGB图像应设置为3，灰度图像应设置为1
         super(MS_SSIM_L1_LOSS, self).__init__()
         if gaussian_sigmas is None:
             gaussian_sigmas = [0.5, 1.0, 2.0, 4.0, 8.0]
@@ -211,7 +226,7 @@ class MS_SSIM_L1_LOSS(nn.Module):
             (self.channel * len(gaussian_sigmas), 1, filter_size, filter_size))  # 创建了(3*5, 1, 33, 33)个masks
         for idx, sigma in enumerate(gaussian_sigmas):
             if self.channel == 1:
-                # only gray layer
+                # 只有灰度层
                 g_masks[idx, 0, :, :] = self._fspecial_gauss_2d(filter_size, sigma)
             elif self.channel == 3:
                 # r0,g0,b0,r1,g1,b1,...,rM,gM,bM
@@ -224,13 +239,13 @@ class MS_SSIM_L1_LOSS(nn.Module):
         self.g_masks = g_masks.cuda(cuda_dev)  # 转换为cuda数据类型
 
     def _fspecial_gauss_1d(self, size, sigma):
-        """Create 1-D gauss kernel
+        """创建1维高斯核
         Args:
-            size (int): the size of gauss kernel
-            sigma (float): sigma of normal distribution
+            size (int): 高斯核的大小
+            sigma (float): 正态分布的标准差
 
         Returns:
-            torch.Tensor: 1D kernel (size)
+            torch.Tensor: 1维核 (size)
         """
         coords = torch.arange(size).to(dtype=torch.float)
         coords -= size // 2
@@ -239,18 +254,17 @@ class MS_SSIM_L1_LOSS(nn.Module):
         return g.reshape(-1)
 
     def _fspecial_gauss_2d(self, size, sigma):
-        """Create 2-D gauss kernel
+        """创建2维高斯核
         Args:
-            size (int): the size of gauss kernel
-            sigma (float): sigma of normal distribution
+            size (int): 高斯核的大小
+            sigma (float): 正态分布的标准差
 
         Returns:
-            torch.Tensor: 2D kernel (size x size)
+            torch.Tensor: 2维核 (size x size)
         """
         gaussian_vec = self._fspecial_gauss_1d(size, sigma)
         return torch.outer(gaussian_vec, gaussian_vec)
-        # Outer product of input and vec2. If input is a vector of size nn and vec2 is a vector of size mm,
-        # then out must be a matrix of size (n \times m)(n×m).
+        # 输入和vec2的外积。如果input是大小为nn的向量，vec2是大小为mm的向量，则out必须是大小为(n×m)的矩阵。
 
     def forward(self, x, y):
         b, c, h, w = x.shape
@@ -280,7 +294,7 @@ class MS_SSIM_L1_LOSS(nn.Module):
         loss_ms_ssim = 1 - lM * PIcs  # [B, H, W]
 
         loss_l1 = F.l1_loss(x, y, reduction='none')  # [B, C, H, W]
-        # average l1 loss in num channels
+        # 平均通道内的l1损失
         gaussian_l1 = F.conv2d(loss_l1, self.g_masks.narrow(dim=0, start=-self.channel, length=self.channel),
                                groups=c, padding=self.pad).mean(1)  # [B, H, W]
 
@@ -288,21 +302,3 @@ class MS_SSIM_L1_LOSS(nn.Module):
         loss_mix = self.compensation * loss_mix
 
         return loss_mix.mean()
-
-
-if __name__ == "__main__":
-    # 假设输入通道数为c，这里我们可以自定义，例如c=16
-    input_channels = 16
-    # 创建一个NAFBlock实例
-    naf_block = NAFBlock(c=input_channels)
-
-    # 创建一个batch_size=1, channels=input_channels, height=64, width=64的随机输入张量
-    input_tensor = torch.rand(1, input_channels, 64, 64)
-
-    # 将输入张量传递给NAFBlock
-    output_tensor = naf_block(input_tensor)
-
-    # 检查输出张量的形状是否与输入张量相同
-    assert output_tensor.shape == input_tensor.shape, f"Output shape {output_tensor.shape} is not the same as input shape {input_tensor.shape}"
-
-    print("Test case passed. The output shape is correct.")
