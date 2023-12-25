@@ -5,10 +5,12 @@ from PIL import Image, ImageDraw, ImageFont
 
 # 拼接主观图像-------------------------------------------------------------------
 # 读取文件夹中的文件列表
-root_path = "E:/cy/Unet/pictures/DB_0/"
-folders = os.listdir(root_path)[:-1]
+proj_path = "E:/cy/Unet"  # 项目路径
+db = "/pictures/DB_0/"  # DB_0是实际数据集，DB_1是测试数据集
+imgs_path = proj_path + db
+folders = os.listdir(imgs_path)[:-1]
 # 补全文件路径
-folders = [root_path + folder for folder in folders]
+folders = [imgs_path + folder for folder in folders]
 images = [os.listdir(folder) for folder in folders]
 for i in range(len(images)):
     folder = folders[i]
@@ -31,4 +33,4 @@ for i in range(images.shape[1]):
     image = image.astype(np.uint8)
 
     # 保存图片
-    cv2.imwrite(root_path + "cat/{}".format(images[0, i].split('/')[-1]), image)
+    cv2.imwrite(imgs_path + "cat/{}".format(images[0, i].split('/')[-1]), image)

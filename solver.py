@@ -448,7 +448,7 @@ class Solver(object):
 
         # self.load_model(self.test_iters)
         self.U_Net.load_state_dict(
-            torch.load(f=r"E:\cy\Unet\save_NAF_LOSS\U_Net_42000iter.ckpt", map_location='cuda'))
+            torch.load(f=r"E:\cy\Unet\save_NAF_LOSS\U_Net_best_85301iter.ckpt", map_location='cuda'))
 
         data_path = "E:/cy/Unet/new_data/"  # 测试图像文件夹的路径
         save_path = os.path.join("E:/cy/Unet/pictures/DB_0/", "3-save_NAF_LOSS")
