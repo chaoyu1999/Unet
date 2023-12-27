@@ -445,7 +445,7 @@ class Solver(object):
     # 测试文件中的图像
     def test_img(self):
         del self.U_Net
-        self.U_Net = DRUNet_CBAM_Multiscale().to(self.device)
+        self.U_Net = NAFUNet().to(self.device)
         self.load_model(self.test_iters)
         data_path = "C:/Users/25351/Downloads/new_data/input"  # 测试图像文件夹的路径
         save_path = os.path.join("C:/Users/25351/Downloads/new_data/", "drunet")
