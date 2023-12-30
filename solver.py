@@ -337,13 +337,13 @@ class Solver(object):
         ####
         # load，加载模型
         # self.REDCNN = RED_CNN().to(self.device)
-        self.U_Net = NAFUNet().to(self.device)
+        self.U_Net = DRUNet_CBAM_Multiscale().to(self.device)
         # self.U_Net = R2U_Net().to(self.device)
         # self.U_Net = AttU_Ne().to(self.device)
         # self.U_Net = R2AttU_Net().to(self.device)
         # self.U_Net = unet_sqq().to(self.device)
 
-        path_root = "E:/cy/Unet/save_NAF_LOSS"
+        path_root = r"E:\cy\结果汇总\NAFUNet\save_DRUNet_CBAM_Multiscale"
         path_input = "%s/fig/input/" % path_root
         path_target = "%s/fig/target/" % path_root
         path_output = "%s/fig/output/" % path_root
